@@ -11,6 +11,13 @@
 # [*status*]
 #   Status of the backup job. Either 'present' or 'absent'. Defaults to 
 #   'present'.
+# [*databases*]
+#   An array containing the names of databases to back up. Defaults to ['all'], 
+#   which backs up all databases.
+# [*incremental*]
+#   Whether to do an incremental backup. Valid values true and false. Defaults 
+#   to false. For correct behavior a full backup has to be created before the 
+#   incremental one.
 # [*output_dir*]
 #   The directory where to output the files. Defaults to /var/backups/local/.
 # [*mysql_user*]
@@ -31,7 +38,7 @@
 define xtrabackup::backup
 (
     $status = 'present',
-    $databases = 'all',
+    $databases = ['all'],
     $incremental = false,
     $output_dir = '/var/backups/local',
     $mysql_user = 'root',
@@ -44,16 +51,20 @@ define xtrabackup::backup
 
     include xtrabackup
 
-    if $databases == 'all' {
+    # Get string representations of the database array
+    $databases_string = join($databases, ' ')
+    $databases_identifier = join($databases, '_and_')
+
+    if $databases_string == 'all' {
         $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd}"
     } else {
-        $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd} --databases=\"${databases}\""
+        $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd} --databases=\"${databases_string}\""
     }
 
     if $incremental == true {
-        $cron_command = "${base_command} --incremental ${output_dir} --incremental-basedir=${output_dir}/latest_full_backup"
+        $cron_command = "${base_command} --incremental ${output_dir} --incremental-basedir=\"${output_dir}/latest_full_backup_of_${databases_identifier}\""
     } else {
-        $cron_command = "${base_command} ${output_dir}/latest_full_backup --no-timestamp"
+        $cron_command = "${base_command} \"${output_dir}/latest_full_backup_of_${databases_identifier}\" --no-timestamp"
     }
 
     cron { "xtrabackup-backup-${title}-cron":

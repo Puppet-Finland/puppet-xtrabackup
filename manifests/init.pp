@@ -2,9 +2,10 @@
 # == Class: xtrabackup
 #
 # Install and configure xtrabackup. This module depends on the "puppetlabs/apt"
-# puppet module:
+# and "puppetlabs/stdlib" modules:
 #
 # <https://forge.puppetlabs.com/puppetlabs/apt>
+# <https://forge.puppetlabs.com/puppetlabs/stdlib>
 #
 # == Parameters
 #

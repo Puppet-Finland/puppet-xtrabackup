@@ -30,6 +30,12 @@
 #   Minute(s) when mysqldump gets run. Defaults to 10.
 # [*weekday*]
 #   Weekday(s) when mysqldump gets run. Defaults to * (all weekdays).
+# [*report_only_errors*]
+#   Suppress all cron output except errors. This is useful for reducing the
+#   amount of emails cron sends.
+# [*email*]
+#   Email address where notifications are sent. Defaults to top-scope variable
+#   $::servermonitor.
 #
 # == Examples
 #
@@ -46,6 +52,8 @@ define xtrabackup::backup
     $hour = '01',
     $minute = '10',
     $weekday = '*',
+    $report_only_errors = 'true',
+    $email = $::servermonitor
 )
 {
 
@@ -55,6 +63,8 @@ define xtrabackup::backup
     $databases_string = join($databases, ' ')
     $databases_identifier = join($databases, '_and_')
 
+    # All these conditionals make this look fairly nasty. Suggestions for 
+    # improvements are most welcome.
     if $databases_string == 'all' {
         $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd}"
     } else {
@@ -62,9 +72,16 @@ define xtrabackup::backup
     }
 
     if $incremental == true {
-        $cron_command = "${base_command} --incremental ${output_dir} --incremental-basedir=\"${output_dir}/latest_full_backup_of_${databases_identifier}\""
+        $base_command_with_type = "${base_command} --incremental ${output_dir} --incremental-basedir=\"${output_dir}/latest_full_backup_of_${databases_identifier}\""
     } else {
-        $cron_command = "${base_command} \"${output_dir}/latest_full_backup_of_${databases_identifier}\" --no-timestamp"
+        $base_command_with_type = "${base_command} \"${output_dir}/latest_full_backup_of_${databases_identifier}\" --no-timestamp"
+    }
+
+    # Even non-error output goes into stderr, so a grep is necessary
+    if $report_only_errors == 'true' {
+        $cron_command = "${base_command_with_type} 2>&1|grep Error"
+    } else {
+        $cron_command = "${base_command_with_type} 2>&1"
     }
 
     cron { "xtrabackup-backup-${title}-cron":
@@ -74,6 +91,7 @@ define xtrabackup::backup
         hour => $hour,
         minute => $minute,
         weekday => $weekday,
+        environment => "MAILTO=${email}",
         require => Class['localbackups'],
     }
 }

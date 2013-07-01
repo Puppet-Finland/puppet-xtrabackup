@@ -9,7 +9,9 @@
 #
 # == Parameters
 #
-# None at the moment
+# [*backup_dir*]
+#   Directory where backups are placed to. Defaults to 
+#   '/var/backups/local/xtrabackup'.
 #
 # == Examples
 #
@@ -25,9 +27,16 @@
 # BSD-lisence
 # See file LICENSE for details
 #
-class xtrabackup {
-
+class xtrabackup
+(
+    $backup_dir='/var/backups/local/xtrabackup'
+)
+{
     include xtrabackup::aptrepo
     include xtrabackup::install
+
+    class { 'xtrabackup::config':
+        backup_dir => $backup_dir,
+    }
 
 }

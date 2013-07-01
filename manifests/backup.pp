@@ -19,7 +19,8 @@
 #   to false. For correct behavior a full backup has to be created before the 
 #   incremental one.
 # [*output_dir*]
-#   The directory where to output the files. Defaults to /var/backups/local/.
+#   The directory where to output the files. Defaults to
+#   $::xtrabackup::config::backup_dir.
 # [*mysql_user*]
 #   MySQL user with rights to dump the specified databases. Defaults to 'root'.
 # [*mysql_passwd*]
@@ -46,7 +47,7 @@ define xtrabackup::backup
     $status = 'present',
     $databases = ['all'],
     $incremental = false,
-    $output_dir = '/var/backups/local',
+    $output_dir = $::xtrabackup::config::backup_dir,
     $mysql_user = 'root',
     $mysql_passwd,
     $hour = '01',
@@ -72,9 +73,9 @@ define xtrabackup::backup
     }
 
     if $incremental == true {
-        $base_command_with_type = "${base_command} --incremental ${output_dir} --incremental-basedir=\"${output_dir}/latest_full_backup_of_${databases_identifier}\""
+        $base_command_with_type = "rm -rf ${output_dir}/${databases_identifier}-incremental && ${base_command} --incremental ${output_dir}/${databases_identifier}-incremental --incremental-basedir=\"${output_dir}/${databases_identifier}-full\" --no-timestamp"
     } else {
-        $base_command_with_type = "${base_command} \"${output_dir}/latest_full_backup_of_${databases_identifier}\" --no-timestamp"
+        $base_command_with_type = "rm -rf ${output_dir}/${databases_identifier}-full && ${base_command} \"${output_dir}/${databases_identifier}-full\" --no-timestamp"
     }
 
     # Even non-error output goes into stderr, so a grep is necessary

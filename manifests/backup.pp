@@ -67,9 +67,9 @@ define xtrabackup::backup
     # All these conditionals make this look fairly nasty. Suggestions for 
     # improvements are most welcome.
     if $databases_string == 'all' {
-        $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd}"
+        $base_command = "innobackupex --user=${mysql_user} --password=\"${mysql_passwd}\""
     } else {
-        $base_command = "innobackupex --user=${mysql_user} --password=${mysql_passwd} --databases=\"${databases_string}\""
+        $base_command = "innobackupex --user=${mysql_user} --password=\"${mysql_passwd}\" --databases=\"${databases_string}\""
     }
 
     if $incremental == true {

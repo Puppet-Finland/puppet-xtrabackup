@@ -12,8 +12,10 @@
 #   Status of the backup job. Either 'present' or 'absent'. Defaults to 
 #   'present'.
 # [*databases*]
-#   An array containing the names of databases to back up. Defaults to ['all'], 
-#   which backs up all databases.
+#   An array containing the names of databases to back up. This should be left 
+#   to it's default value, ['all'], so that all databases are backed up. Change 
+#   this only if you're sure you can handle the fairly complex process of 
+#   restoring from partial backups with innobackupex.
 # [*incremental*]
 #   Whether to do an incremental backup. Valid values true and false. Defaults 
 #   to false. For correct behavior a full backup has to be created before the 

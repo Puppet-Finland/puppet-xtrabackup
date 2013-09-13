@@ -32,11 +32,14 @@ class xtrabackup
     $backup_dir='/var/backups/local/xtrabackup'
 )
 {
+# Rationale for this is explained in init.pp of the sshd module
+if hiera('manage_xtrabackup') != 'false' {
+
     include xtrabackup::aptrepo
     include xtrabackup::install
 
     class { 'xtrabackup::config':
         backup_dir => $backup_dir,
     }
-
+}
 }

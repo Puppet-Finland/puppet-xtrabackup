@@ -33,7 +33,7 @@ class xtrabackup
 )
 {
 # Rationale for this is explained in init.pp of the sshd module
-if hiera('manage_xtrabackup') != 'false' {
+if hiera('manage_xtrabackup', 'true') != 'false' {
 
     include xtrabackup::aptrepo
     include xtrabackup::install

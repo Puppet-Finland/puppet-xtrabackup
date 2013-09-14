@@ -28,11 +28,11 @@
 # [*mysql_passwd*]
 #   Password for the above user.
 # [*hour*]
-#   Hour(s) when mysqldump gets run. Defaults to 01.
+#   Hour(s) when xtrabackup gets run. Defaults to 01.
 # [*minute*]
-#   Minute(s) when mysqldump gets run. Defaults to 10.
+#   Minute(s) when xtrabackup gets run. Defaults to 10.
 # [*weekday*]
-#   Weekday(s) when mysqldump gets run. Defaults to * (all weekdays).
+#   Weekday(s) when xtrabackup gets run. Defaults to * (all weekdays).
 # [*report_only_errors*]
 #   Suppress all cron output except errors. This is useful for reducing the
 #   amount of emails cron sends.

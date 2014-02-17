@@ -9,6 +9,11 @@
 #
 # == Parameters
 #
+# [*proxy_url*]
+#   The proxy URL used for fetching the xtrabackup software repository public 
+#   keys. For example "http://proxy.domain.com:8888". Not needed if the node has 
+#   direct Internet connectivity, or if you're installing xtrabackup from your 
+#   operating system repositories. Defaults to 'none' (do not use a proxy).
 # [*backup_dir*]
 #   Directory where backups are placed to. Defaults to 
 #   '/var/backups/local/xtrabackup'.
@@ -29,13 +34,17 @@
 #
 class xtrabackup
 (
+    $proxy_url = 'none',
     $backup_dir='/var/backups/local/xtrabackup'
 )
 {
 # Rationale for this is explained in init.pp of the sshd module
 if hiera('manage_xtrabackup', 'true') != 'false' {
 
-    include xtrabackup::aptrepo
+    class { 'xtrabackup::softwarerepo':
+        proxy_url => $proxy_url,
+    }
+
     include xtrabackup::install
 
     class { 'xtrabackup::config':

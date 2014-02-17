@@ -8,7 +8,7 @@ class xtrabackup::install {
     package { 'xtrabackup-percona-xtrabackup':
         name => 'xtrabackup',
         ensure => installed,
-        require => Class['xtrabackup::aptrepo'],
+        require => Class['xtrabackup::softwarerepo'],
     }
 
 }

@@ -27,6 +27,14 @@
 #   MySQL user with rights to dump the specified databases. Defaults to 'root'.
 # [*mysql_passwd*]
 #   Password for the above user.
+# [*use_root_defaults*]
+#   Defines whether to load /root/.my.cnf or not. This is intended to help 
+#   prevent mysql passwords from leaking out in cron's emails if xtrabackup 
+#   errors out for whatever reason. Set this parameter to 'yes' to use this 
+#   feature and make sure that /root/.my.cnf exists on the target nodes (e.g. by 
+#   including the mysql::config::rootopts class). The default value is 'no', 
+#   which means that the $mysql_user and $mysql_passwd will be used for 
+#   authentication.
 # [*hour*]
 #   Hour(s) when xtrabackup gets run. Defaults to 01.
 # [*minute*]
@@ -51,7 +59,8 @@ define xtrabackup::backup
     $incremental = false,
     $output_dir = $::xtrabackup::config::backup_dir,
     $mysql_user = 'root',
-    $mysql_passwd,
+    $mysql_passwd = '',
+    $use_root_defaults = 'no',
     $hour = '01',
     $minute = '10',
     $weekday = '*',
@@ -66,12 +75,16 @@ define xtrabackup::backup
     $databases_string = join($databases, ' ')
     $databases_identifier = join($databases, '_and_')
 
-    # All these conditionals make this look fairly nasty. Suggestions for 
-    # improvements are most welcome.
-    if $databases_string == 'all' {
-        $base_command = "innobackupex --user=${mysql_user} --password=\"${mysql_passwd}\""
+    if $use_root_defaults == 'yes' {
+        $auth_string = "--defaults-extra-file=/root/.my.cnf"
     } else {
-        $base_command = "innobackupex --user=${mysql_user} --password=\"${mysql_passwd}\" --databases=\"${databases_string}\""
+        $auth_string = "--user=${mysql_user} --password=\"${mysql_passwd}\""
+    }
+
+    if $databases_string == 'all' {
+        $base_command = "innobackupex ${auth_string}"
+    } else {
+        $base_command = "innobackupex ${auth_string} --databases=\"${databases_string}\""
     }
 
     if $incremental == true {

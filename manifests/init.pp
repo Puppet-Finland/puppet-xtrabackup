@@ -17,6 +17,8 @@
 # [*backup_dir*]
 #   Directory where backups are placed to. Defaults to 
 #   '/var/backups/local/xtrabackup'.
+# [*backups*]
+#   A hash of xtrabackup::backup resources to realize.
 #
 # == Examples
 #
@@ -35,7 +37,8 @@
 class xtrabackup
 (
     $proxy_url = 'none',
-    $backup_dir='/var/backups/local/xtrabackup'
+    $backup_dir='/var/backups/local/xtrabackup',
+    $backups = {}
 )
 {
 # Rationale for this is explained in init.pp of the sshd module
@@ -50,5 +53,8 @@ if hiera('manage_xtrabackup', 'true') != 'false' {
     class { 'xtrabackup::config':
         backup_dir => $backup_dir,
     }
+
+    # Realize the defined backup jobs
+    create_resources('xtrabackup::backup', $backups)
 }
 }

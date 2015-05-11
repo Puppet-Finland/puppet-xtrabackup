@@ -9,28 +9,31 @@
 class xtrabackup::softwarerepo
 (
     $proxy_url
-)
+
+) inherits xtrabackup::params
 {
 
     if $::osfamily == 'Debian' {
 
-        apt::key { 'xtrabackup-aptrepo':
-            key               => '1C4CBDCDCD2EFD2A',
-            key_server        => 'keys.gnupg.net',
-            key_options       => $proxy_url ? {
-                'none'        => undef,
-                default       => "http-proxy=\"$proxy_url\"",
-            },
+        $key_options = $proxy_url ? {
+            'none'        => undef,
+            default       => "http-proxy=\"${proxy_url}\"",
         }
 
         apt::source { 'xtrabackup-aptrepo':
-            location          => 'http://repo.percona.com/apt',
-            release           => "${::lsbdistcodename}",
-            repos             => 'main',
-            required_packages => undef,
-            pin               => '501',
-            include_src       => true,
-            require => Apt::Key['xtrabackup-aptrepo'],
+            location => 'http://repo.percona.com/apt',
+            release  => $::lsbdistcodename,
+            repos    => 'main',
+            pin      => '501',
+            key      => {
+                'id'      => '430BDF5C56E7C94E848EE60C1C4CBDCDCD2EFD2A',
+                'server'  => 'keys.gnupg.net',
+                'options' => $key_options,
+            },
+            include  => {
+                'src' => true,
+                'deb' => true,
+            },
         }
     }
 }

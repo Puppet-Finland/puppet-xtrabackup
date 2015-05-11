@@ -21,3 +21,5 @@ This module has been tested on
 * Ubuntu 14.04
 
 It should work on other *NIX operating systems with minor modifications.
+
+For details see [params.pp](manifests/params.pp).

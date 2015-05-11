@@ -3,11 +3,11 @@
 #
 # Install xtrabackup
 #
-class xtrabackup::install {
+class xtrabackup::install inherits xtrabackup::params {
 
     package { 'xtrabackup-percona-xtrabackup':
-        name => 'xtrabackup',
-        ensure => installed,
+        ensure  => installed,
+        name    => 'xtrabackup',
         require => Class['xtrabackup::softwarerepo'],
     }
 

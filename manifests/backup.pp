@@ -8,7 +8,7 @@
 #
 # == Parameters
 #
-# [*status*]
+# [*ensure*]
 #   Status of the backup job. Either 'present' or 'absent'. Defaults to 
 #   'present'.
 # [*databases*]
@@ -30,9 +30,9 @@
 # [*use_root_defaults*]
 #   Defines whether to load /root/.my.cnf or not. This is intended to help 
 #   prevent mysql passwords from leaking out in cron's emails if xtrabackup 
-#   errors out for whatever reason. Set this parameter to 'yes' to use this 
+#   errors out for whatever reason. Set this parameter to true to use this 
 #   feature and make sure that /root/.my.cnf exists on the target nodes (e.g. by 
-#   including the mysql::config::rootopts class). The default value is 'no', 
+#   including the mysql::config::rootopts class). The default value is false, 
 #   which means that the $mysql_user and $mysql_passwd will be used for 
 #   authentication.
 # [*hour*]
@@ -48,35 +48,31 @@
 #   Email address where notifications are sent. Defaults to top-scope variable
 #   $::servermonitor.
 #
-# == Examples
-#
-# }
-#
 define xtrabackup::backup
 (
-    $status = 'present',
+    $ensure = 'present',
     $databases = ['all'],
     $incremental = false,
     $output_dir = $::xtrabackup::config::backup_dir,
     $mysql_user = 'root',
-    $mysql_passwd = '',
-    $use_root_defaults = 'no',
+    $mysql_passwd = undef,
+    $use_root_defaults = false,
     $hour = '01',
     $minute = '10',
     $weekday = '*',
-    $report_only_errors = 'true',
+    $report_only_errors = true,
     $email = $::servermonitor
 )
 {
-
-    include xtrabackup
+    include ::xtrabackup
+    include ::xtrabackup::params
 
     # Get string representations of the database array
     $databases_string = join($databases, ' ')
     $databases_identifier = join($databases, '_and_')
 
-    if $use_root_defaults == 'yes' {
-        $auth_string = "--defaults-extra-file=/root/.my.cnf"
+    if $use_root_defaults {
+        $auth_string = '--defaults-extra-file=/root/.my.cnf'
     } else {
         $auth_string = "--user=${mysql_user} --password=\"${mysql_passwd}\""
     }
@@ -87,27 +83,27 @@ define xtrabackup::backup
         $base_command = "innobackupex ${auth_string} --databases=\"${databases_string}\""
     }
 
-    if $incremental == true {
+    if $incremental {
         $base_command_with_type = "rm -rf ${output_dir}/${databases_identifier}-incremental && ${base_command} --incremental ${output_dir}/${databases_identifier}-incremental --incremental-basedir=\"${output_dir}/${databases_identifier}-full\" --no-timestamp"
     } else {
         $base_command_with_type = "rm -rf ${output_dir}/${databases_identifier}-full && ${base_command} \"${output_dir}/${databases_identifier}-full\" --no-timestamp"
     }
 
     # Even non-error output goes into stderr, so a grep is necessary
-    if $report_only_errors == 'true' {
+    if $report_only_errors {
         $cron_command = "${base_command_with_type} 2>&1|grep Error"
     } else {
         $cron_command = "${base_command_with_type} 2>&1"
     }
 
     cron { "xtrabackup-backup-${title}-cron":
-        ensure => $status,
-        command => $cron_command,
-        user => root,
-        hour => $hour,
-        minute => $minute,
-        weekday => $weekday,
+        ensure      => $ensure,
+        command     => $cron_command,
+        user        => root,
+        hour        => $hour,
+        minute      => $minute,
+        weekday     => $weekday,
         environment => "MAILTO=${email}",
-        require => Class['localbackups'],
+        require     => Class['localbackups'],
     }
 }

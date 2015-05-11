@@ -9,6 +9,9 @@
 #
 # == Parameters
 #
+# [*manage*]
+#   Whether to manage xtrabackup using Puppet. Valid values are 'yes' (default) 
+#   and 'no'.
 # [*proxy_url*]
 #   The proxy URL used for fetching the xtrabackup software repository public 
 #   keys. For example "http://proxy.domain.com:8888". Not needed if the node has 
@@ -36,21 +39,22 @@
 #
 class xtrabackup
 (
+    $manage = 'yes',
     $proxy_url = 'none',
     $backup_dir='/var/backups/local/xtrabackup',
     $backups = {}
 )
 {
-# Rationale for this is explained in init.pp of the sshd module
-if hiera('manage_xtrabackup', 'true') != 'false' {
 
-    class { 'xtrabackup::softwarerepo':
+if $manage == 'yes' {
+
+    class { '::xtrabackup::softwarerepo':
         proxy_url => $proxy_url,
     }
 
-    include xtrabackup::install
+    include ::xtrabackup::install
 
-    class { 'xtrabackup::config':
+    class { '::xtrabackup::config':
         backup_dir => $backup_dir,
     }
 

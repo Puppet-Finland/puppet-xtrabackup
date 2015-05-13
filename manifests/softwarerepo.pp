@@ -15,6 +15,8 @@ class xtrabackup::softwarerepo
 
     if $::osfamily == 'Debian' {
 
+        include ::apt
+
         $key_options = $proxy_url ? {
             'none'        => undef,
             default       => "http-proxy=\"${proxy_url}\"",

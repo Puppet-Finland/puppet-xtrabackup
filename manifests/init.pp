@@ -10,8 +10,8 @@
 # == Parameters
 #
 # [*manage*]
-#   Whether to manage xtrabackup using Puppet. Valid values are 'yes' (default) 
-#   and 'no'.
+#   Whether to manage xtrabackup using Puppet. Valid values are true (default) 
+#   and false.
 # [*proxy_url*]
 #   The proxy URL used for fetching the xtrabackup software repository public 
 #   keys. For example "http://proxy.domain.com:8888". Not needed if the node has 
@@ -39,14 +39,14 @@
 #
 class xtrabackup
 (
-    $manage = 'yes',
-    $proxy_url = 'none',
-    $backup_dir='/var/backups/local/xtrabackup',
-    $backups = {}
+    Boolean $manage = true,
+    String  $proxy_url = 'none',
+    String  $backup_dir = '/var/backups/local/xtrabackup',
+    Hash    $backups = {}
 )
 {
 
-if $manage == 'yes' {
+if $manage {
 
     class { '::xtrabackup::softwarerepo':
         proxy_url => $proxy_url,

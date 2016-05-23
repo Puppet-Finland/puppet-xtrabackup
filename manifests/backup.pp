@@ -50,18 +50,18 @@
 #
 define xtrabackup::backup
 (
-    $ensure = 'present',
-    $databases = ['all'],
-    $incremental = false,
-    $output_dir = $::xtrabackup::config::backup_dir,
-    $mysql_user = 'root',
-    $mysql_passwd = undef,
-    $use_root_defaults = false,
-    $hour = '01',
-    $minute = '10',
-    $weekday = '*',
-    $report_only_errors = true,
-    $email = $::servermonitor
+    Enum['present', 'absent'] $ensure = 'present',
+    Array                     $databases = ['all'],
+    Boolean                   $incremental = false,
+    String                    $output_dir = $::xtrabackup::config::backup_dir,
+    String                    $mysql_user = 'root',
+    Optional[String]          $mysql_passwd = undef,
+    Boolean                   $use_root_defaults = false,
+    Variant[Integer, String]  $hour = '01',
+    Variant[Integer, String]  $minute = '10',
+    Variant[Integer, String]  $weekday = '*',
+    Boolean                   $report_only_errors = true,
+    String                    $email = $::servermonitor
 )
 {
     include ::xtrabackup

@@ -5,7 +5,7 @@
 #
 class xtrabackup::config
 (
-    $backup_dir
+    String $backup_dir
 
 ) inherits xtrabackup::params
 {

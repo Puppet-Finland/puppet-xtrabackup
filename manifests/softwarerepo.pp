@@ -8,7 +8,7 @@
 #
 class xtrabackup::softwarerepo
 (
-    $proxy_url
+    String $proxy_url
 
 ) inherits xtrabackup::params
 {

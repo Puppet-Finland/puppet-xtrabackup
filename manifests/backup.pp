@@ -57,9 +57,9 @@ define xtrabackup::backup
     String                    $mysql_user = 'root',
     Optional[String]          $mysql_passwd = undef,
     Boolean                   $use_root_defaults = false,
-    Variant[Integer, String]  $hour = '01',
-    Variant[Integer, String]  $minute = '10',
-    Variant[Integer, String]  $weekday = '*',
+    Variant[Array[Integer], Array[String], Integer, String] $hour = '01',
+    Variant[Array[Integer], Array[String], Integer, String] $minute = '10',
+    Variant[Array[Integer], Array[String], Integer, String] $weekday = '*',
     Boolean                   $report_only_errors = true,
     String                    $email = $::servermonitor
 )

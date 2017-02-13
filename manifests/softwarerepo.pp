@@ -22,20 +22,23 @@ class xtrabackup::softwarerepo
             default       => "http-proxy=\"${proxy_url}\"",
         }
 
+        apt::key { 'percona-apt-key':
+            ensure  => 'present',
+            id      => '4D1BB29D63D98E422B2113B19334A25F8507EFA5',
+            content => template('xtrabackup/percona.key.erb'),
+            options => $key_options,
+        }
+
         apt::source { 'xtrabackup-aptrepo':
             location => 'http://repo.percona.com/apt',
             release  => $::lsbdistcodename,
             repos    => 'main',
             pin      => '501',
-            key      => {
-                'id'      => '430BDF5C56E7C94E848EE60C1C4CBDCDCD2EFD2A',
-                'server'  => 'keys.gnupg.net',
-                'options' => $key_options,
-            },
             include  => {
                 'src' => true,
                 'deb' => true,
             },
+            require  => Apt::Key['percona-apt-key'],
         }
     }
 }

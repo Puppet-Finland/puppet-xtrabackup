@@ -1,25 +1,23 @@
 xtrabackup
 ==========
 
-A puppet module for managing xtrabackup
+A puppet module for managing xtrabackup-based backups.
 
 # Module usage
 
-* [Class: xtrabackup](manifests/init.pp)
-* [Define: xtrabackup::backup](manifests/backup.pp)
+Add a daily xtrabackup cronjob:
 
-# Dependencies
+    include ::xtrabackup
+    
+    ::xtrabackup::backup { 'daily':
+      ensure            => present,
+      databases         => [ 'all' ],
+      incremental       => true,
+      use_root_defaults => true,
+      hour              => '23',
+      minute            => '50',
+      weekday           => '*',
+      email             => 'monitoring@example.org',
+    }
 
-See [metadata.json](metadata.json).
-
-# Operating system support
-
-This module has been tested on
-
-* Debian 7
-* Ubuntu 12.04
-* Ubuntu 14.04
-
-It should work on other *NIX operating systems with minor modifications.
-
-For details see [params.pp](manifests/params.pp).
+For details see [init.pp](manifests/init.pp) and [backup.pp](manifests/backup.pp).

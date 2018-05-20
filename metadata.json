@@ -1,6 +1,6 @@
 {
   "name": "puppetfinland-xtrabackup",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Puppet-Finland team",
   "summary": "Manage xtrabackup-based backups",
   "license": "BSD-2-Clause",
@@ -23,7 +23,6 @@
       "name": "puppetfinland/localbackups",
       "version_requirement": ">= 0.5.2"
     }
-
   ],
   "operatingsystem_support": [
     {

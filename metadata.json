@@ -1,6 +1,6 @@
 {
   "name": "puppetfinland-xtrabackup",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Puppet-Finland team",
   "summary": "Manage xtrabackup-based backups",
   "license": "BSD-2-Clause",

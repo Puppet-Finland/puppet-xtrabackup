@@ -106,6 +106,5 @@ define xtrabackup::backup
         minute      => $minute,
         weekday     => $weekday,
         environment => "MAILTO=${email}",
-        require     => File[$output_dir],
     }
 }

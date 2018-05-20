@@ -96,8 +96,7 @@ define xtrabackup::backup
         $cron_command = "${base_command_with_type} 2>&1"
     }
 
-    # Several other modules will attempt ensure that this same directory exists
-    ensure_resource('file', $output_dir, { 'ensure' => 'directory' })
+    include ::localbackups
 
     cron { "xtrabackup-backup-${title}-cron":
         ensure      => $ensure,
